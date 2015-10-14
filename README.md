@@ -1,5 +1,8 @@
-#firebase-python
+#firebase-python-streaming
 ######A nice, easy Python Firebase integration
+
+####Original Repo
+https://github.com/shariq/firebase-python
 
 Supports streaming data.
 
@@ -11,33 +14,64 @@ https://www.firebase.com/signup/
 (warning: The free level of Firebase only allows up to 50 concurrent connections. Don't hit this limit!)
 
 
+## Firebase object
+
+Instaniate the object with using your firebase URL as follows:
+
+ ```python
+ firebase = Firebase('https://<YOUR_FIREBASE>.firebaseio.com/')
+ ```
+
+Code from the upstream repo supports different URL formats; this functionality is deprecated.
+
+ From here you can make `get`, `put`, and `patch` calls on the object. Additionally, you can navigate to child levels using `child`.  
+
+##child
+
+Use `firebase.child("child")` to navigate. This returns a reference to another firebase object with the URL of the child object.
+
+```python
+
+firebase = Firebase('https://myfirebase.firebaseio.com/')
+users = firebase.child("users")
+
+andrew = users.child("andrewsosa001")
+
+```
+
+Since children objects are Firebase objects, you can use all the normal get/put/patch commands.
 
 ##get and put
 
-`get` gets the value of a Firebase at some URL, and `put` sets the value of a Firebase at URL to some data.
+These commands have been object-oriented since the previous library. They are now called from the Firebase object, and do not require URLs to be provided.
+
+`get` gets the value(s) of a Firebase it's given url, and `put` sets the value of a Firebase's url to some data.
 
 ```python
->>> import firebase
->>> URL = 'lucid-lychee'  # see note on URLs at the bottom of documentation
->>> print firebase.get(URL)  # this is an empty Firebase
+>>> from firebase_streaming import Firebase
+
+# Firebase object
+>>> myFirebase = Firebase('https://myfirebase.firebaseio.com/')
+>>> print myFirebase.get()  # this is an empty Firebase
 None
 
->>> firebase.put(URL, 'tell me everything')  # can take a string
+>>> myFirebase.put('This is my firebase!')  # can take a string
 >>> print firebase.get(URL)
-tell me everything
+This is my firebase!
 
->>> firebase.put(URL, {'lucidity': 9001})  # or a dictionary
->>> print firebase.get(URL)
-{u'lucidity': 9001}
+>>> myFirebase.put({"Who's firebase?": "My firebase!"})  # or a dictionary
+>>> print myFirebase.get(URL)
+{"Who's firebase?": "My firebase!"}
 
->>> firebase.put(URL, {'color': 'red'})  # replaces old value
->>> print firebase.get(URL)
-{u'color': u'red'}
+# Sub-firebase.
+>>> myColors = myFirebase.child("colors")
+>>> print myColors.get()
 
->>> print firebase.get(URL + '/color')
-red
+>>> myColors.put({'color': 'red'})
+>>> print myColors.get()
+{'color': 'red'}
+
 ```
-
 
 
 ##patch
@@ -45,17 +79,16 @@ red
 `patch` adds new key value pairs to an existing Firebase, without deleting the old key value pairs.
 
 ```python
->>> import firebase
->>> URL = 'tibetan-tumbleweed'
+>>> firebase = Firebase('https://myfirebase.firebaseio.com/')
 >>> print firebase.get(URL)
 None
 
->>> firebase.patch(URL, {'taste': 'tibetan'})
->>> print firebase.get(URL)
+>>> firebase.patch({'taste': 'tibetan'})
+>>> print firebase.get()
 {u'taste': u'tibetan'}
 
->>> firebase.patch(URL, {'size': 'tumbly})  # patching does not overwrite
->>> print firebase.get(URL)
+>>> firebase.patch({'size': 'tumbly})  # patching does not overwrite
+>>> print firebase.get()
 {u'taste': u'tibetan', u'size': u'tumbly'}
 ```
 
@@ -90,7 +123,10 @@ None
 
 
 ##URLs
-All URLs are internally converted to the apparent Firebase URL. This is done by the `firebaseURL` method.
+
+**This method has been deprecated in this library, and only exists to serve existing code from the previous version. Do not use these formats to instantiate your Firebase objects.**
+
+All URLs are internally converted to a Firebase URL format. This is done by the `firebaseURL` method. This method supports the following inputs.
 
 ```python
 >>> import firebase
@@ -104,3 +140,5 @@ https://bony-badger.firebaseio.com/bones/humerus.json
 >>> print firebase.firebaseURL('bony-badger.firebaseio.com/')
 https://bony-badger.firebaseio.com/.json
 ```
+
+In this library version, the instantition name must end with `.com/`, as the `.child()` function appends the current Firebase's name with the child's directory. Because the name must end with `/`, the above formats are not supported by this library.

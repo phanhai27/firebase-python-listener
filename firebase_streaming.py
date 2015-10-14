@@ -7,6 +7,11 @@ from Queue import Queue
 import json
 import threading
 import socket
+import ast
+
+
+def json_to_dict(response):
+    return ast.literal_eval(json.dumps(response))
 
 
 class ClosableSSEClient(SSEClient):
@@ -43,9 +48,10 @@ class RemoteThread(threading.Thread):
         try:
             self.sse = ClosableSSEClient(self.URL)
             for msg in self.sse:
-                msg_data = json.loads(msg.data)
-                if msg_data is None:    # keep-alives
+                msg_test = json.loads(msg.data)
+                if msg_test is None:    # keep-alives
                     continue
+                msg_data = json_to_dict(msg.data)
                 msg_event = msg.event
                 # TODO: update parent cache here
                 self.function((msg.event, msg_data))
@@ -84,7 +90,7 @@ def firebaseURL(URL):
     return URL
 
 
-class subscriber:
+class EventListener:
 
     def __init__(self, URL, function):
         self.cache = {}
@@ -104,31 +110,39 @@ class subscriber:
 class FirebaseException(Exception):
     pass
 
+class Firebase():
 
-def put(URL, msg):
-    to_post = json.dumps(msg)
-    response = requests.put(firebaseURL(URL), data=to_post)
-    if response.status_code != 200:
-        raise FirebaseException(response.text)
+    def __init__(self, name):
+        self.name = name
+        self.URL = firebaseURL(name)
 
+    def child(self, child):
+        return Firebase(self.name + child + "/")
 
-def patch(URL, msg):
-    to_post = json.dumps(msg)
-    response = requests.patch(firebaseURL(URL), data=to_post)
-    if response.status_code != 200:
-        raise FirebaseException(response.text)
+    def put(self, msg):
+        to_post = json.dumps(msg)
+        response = requests.put(firebaseURL(self.URL), data=to_post)
+        if response.status_code != 200:
+            raise FirebaseException(response.text)
 
+    def patch(self, msg):
+        to_post = json.dumps(msg)
+        response = requests.patch(firebaseURL(self.URL), data=to_post)
+        if response.status_code != 200:
+            raise FirebaseException(response.text)
 
-def get(URL):
-    response = requests.get(firebaseURL(URL))
-    if response.status_code != 200:
-        raise FirebaseException(response.text)
-    return json.loads(response.text)
+    def get(self):
+        response = requests.get(firebaseURL(self.URL))
+        if response.status_code != 200:
+            raise FirebaseException(response.text)
+        return json_to_dict(response)
 
+    def listener(self, callback=None):
 
-# Yuck, I don't want to write documentation for this :p
-#def push(URL, msg):
-#    to_post = json.dumps(msg)
-#    response = requests.post(firebaseURL(URL), data=to_post)
-#    if response.status_code != 200:
-#        raise Exception(response.text)
+        def handle(response):
+            print response
+
+        return EventListener(self.name, callback or handle)
+
+    def __str__(self):
+        return self.name

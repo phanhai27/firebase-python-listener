@@ -94,31 +94,11 @@ None
 
 
 
-##subscriber
+##listener
 
-`subscriber` takes a URL and callback function and calls the callback on every update of the Firebase at URL.
+The Firebase `listener` provides streaming functionality. It takes an optional callback function which it calls on every update to the Firebase object.
 
-```python
->>> import firebase
->>> from pprint import pprint  # function which pretty prints objects
->>> URL = 'clumsy-clementine'
->>> S = firebase.subscriber(URL, pprint)  # pprint will be called on all Firebase updates
->>> S.start()  # will get called with initial value of URL, which is empty
-(u'put', {u'data': None, u'path': u'/'})
-
->>> firebase.put(URL, ';-)')  # will make S print something
-(u'put', {u'data': u';-)', u'path': u'/'})
-
->>> firebase.put(URL, {'status': 'mortified'})  # continuing from above
-(u'put', {u'data': {u'status': u'mortified'}, u'path': u'/'})
->>> firebase.patch(URL, {'reason': 'blushing'})  # same data, different method
-(u'patch', {u'data': {u'reason': u'blushing'}, u'path': u'/'})
-
->>> firebase.put(URL + '/color', 'red')
-(u'put', {u'data': u'red', u'path': u'/color'})
-
->>> S.stop()
-```
+See `sample.py` for use. ``
 
 
 

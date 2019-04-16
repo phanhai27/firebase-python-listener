@@ -26,7 +26,7 @@ Code from the upstream repo supports different URL formats; this functionality i
 
  From here you can make `get`, `put`, and `patch` calls on the object. Additionally, you can navigate to child levels using `child`.  
 
-##child
+## child
 
 Use `firebase.child("child")` to navigate. This returns a reference to another firebase object with the URL of the child object.
 
@@ -41,7 +41,7 @@ andrew = users.child("andrewsosa001")
 
 Since children objects are Firebase objects, you can use all the normal get/put/patch commands.
 
-##get and put
+## get and put
 
 These commands have been object-oriented since the previous library. They are now called from the Firebase object, and do not require URLs to be provided.
 
@@ -74,7 +74,7 @@ This is my firebase!
 ```
 
 
-##patch
+## patch
 
 `patch` adds new key value pairs to an existing Firebase, without deleting the old key value pairs.
 
@@ -94,7 +94,7 @@ None
 
 
 
-##listener
+## listener
 
 The Firebase `listener` provides streaming functionality. It takes an optional callback function which it calls on every update to the Firebase object.
 
@@ -102,7 +102,7 @@ See `sample.py` for use. ``
 
 
 
-##URLs
+## URLs
 
 **This method has been deprecated in this library, and only exists to serve existing code from the previous version. Do not use these formats to instantiate your Firebase objects.**
 

@@ -1,7 +1,7 @@
-#firebase-python-streaming
-######A nice, easy Python Firebase integration
+# firebase-python-streaming
+###### A nice, easy Python Firebase integration
 
-####Original Repo
+#### Original Repo
 https://github.com/shariq/firebase-python
 
 Supports streaming data.

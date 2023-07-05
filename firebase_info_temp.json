@@ -1,0 +1,5 @@
+{
+  "root_url": "https://your.firebaseio.com/",
+  "child_path": "path/to/child",
+  "agent_id": "123456789"
+}

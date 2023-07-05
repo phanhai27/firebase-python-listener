@@ -3,7 +3,6 @@
 from sseclient import SSEClient
 import requests
 
-from Queue import Queue
 import json
 import threading
 import socket
@@ -53,15 +52,37 @@ class RemoteThread(threading.Thread):
                     continue
                 msg_data = json_to_dict(msg.data)
                 msg_event = msg.event
-                # TODO: update parent cache here
-                self.function((msg.event, msg_data))
+
+                DEBUG = False
+                if msg_event == 'put':
+                    if msg_test['path'] == "/":
+                        self.parent.admin_id = msg_test['data']['admin_id']
+                        self.parent.notif = msg_test['data']['notif']
+                        self.parent.timestamp = msg_test['data']['timestamp']
+                    elif msg_test['path'] == "/admin_id":
+                        self.parent.admin_id = msg_test['data']
+                    elif msg_test['path'] == "/notif":
+                        self.parent.notif = msg_test['data']
+                    elif msg_test['path'] == "/timestamp":
+                        self.parent.timestamp = msg_test['data']
+                    else:
+                        DEBUG = True
+                else:
+                    DEBUG = True
+
+                if DEBUG:
+                    print("DEBUG event: " + msg_event)
+                    print("DEBUG data: " + msg_data)
+                
+                self.function(self.parent)
+
         except socket.error:
             pass    # this can happen when we close the stream
         except KeyboardInterrupt:
             self.close()
 
     def close(self):
-        if self.sse:
+        if hasattr(self, 'sse'):
             self.sse.close()
 
 
@@ -93,6 +114,10 @@ def firebaseURL(URL):
 class EventListener:
 
     def __init__(self, URL, function):
+        self.admin_id = {}
+        self.notif = {}
+        self.timestamp = {}
+        
         self.cache = {}
         self.remote_thread = RemoteThread(self, firebaseURL(URL), function)
 
@@ -140,7 +165,7 @@ class Firebase():
     def listener(self, callback=None):
 
         def handle(response):
-            print response
+            print(response)
 
         return EventListener(self.name, callback or handle)
 

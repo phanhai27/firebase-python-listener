@@ -1,4 +1,4 @@
-# firebase-python-streaming
+# firebase-python-listener
 ###### A nice, easy Python Firebase integration
 
 #### Original Repo
@@ -6,7 +6,7 @@ https://github.com/shariq/firebase-python
 
 Supports streaming data.
 
-Requires `requests` and `sseclient`, which are on pip. If you don't know what that is, don't worry; just run `./setup.sh`. Made for Python 2.7.
+Requires `requests` and `sseclient`, which are on pip. If you don't know what that is, don't worry; just run `./setup.sh`. Made for Python 3.11.
 
 First create a Firebase here:
 https://www.firebase.com/signup/
